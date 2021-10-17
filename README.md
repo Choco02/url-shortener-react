@@ -3,7 +3,10 @@
 ## You are free for modify it 
 
 
-## **Not creating link yet, it needs a database** 
+## **Not creating link yet, it needs a database**  
+
+### Check it out at https://cakee.vercel.app (for testing purposes)
+### A shortened example link https://cakee.vercel.app/cookie
 
 # How to run the project 🍰
 
