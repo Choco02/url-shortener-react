@@ -3,7 +3,6 @@
 ## You are free for modify it 
 
 
-## **Not creating link yet, it needs a database**  
 
 ### Check it out at https://cakee.vercel.app (for testing purposes)
 ### A shortened example link https://cakee.vercel.app/cookie
@@ -17,9 +16,9 @@
 
 # TODO
 
-- [ ] Fix URL regex
+- [x] Fix URL regex
 
-- [ ] Add database
+- [x] Add database
 
 - [ ] Add a logger 
 
