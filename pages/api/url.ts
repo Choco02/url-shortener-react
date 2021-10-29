@@ -1,5 +1,10 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
+import { MongoClient } from 'mongodb';
+import { config } from 'dotenv';
+config();
+
+const client = new MongoClient(process.env.MONGODB_URI as string);
 
 const simpleSanitize = (str: string) => str.replace(/[^\w:\/\/\.@#\-=?%]/gi, '')
 
@@ -19,26 +24,33 @@ type Data = {
   message?: string
 }
 
-type urlModel = {
+interface IUrlModel {
   url: string
   short: string
 }
 
-const data: urlModel[] = [
-    {
-      url: 'https://www.youtube.com/watch?v=LLK4oaXUuLg',
-      short: 'cookie'
-    },
-    {
-      url: 'https://open.spotify.com/playlist/6hCnguf17Sm20PtOVJ2ltq',
-      short: 'playlist'
-    }
-  ]
+const urls = client.db().collection<IUrlModel>('urls');
 
-export default function handler(
+const data: IUrlModel[] = [
+  {
+    url: 'https://www.youtube.com/watch?v=LLK4oaXUuLg',
+    short: 'cookie'
+  },
+  {
+    url: 'https://open.spotify.com/playlist/6hCnguf17Sm20PtOVJ2ltq',
+    short: 'playlist'
+  }
+];
+
+
+export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
+
+  await client.connect();
+  const d = await urls.find({}).toArray();
+  data.push(...d);
 
   if (req.method === 'POST') {
 
@@ -77,11 +89,15 @@ export default function handler(
       }
       else short = customUrl
 
-      const newUrl: urlModel = {
+      const newUrl: IUrlModel = {
         url,
         short
-      }
+      };
       
+      (async () => {
+        urls.insertOne(newUrl);
+      })()
+
       data.push(newUrl)
 
       res.status(status.CREATED).json({ url: `http://${req.headers.host}/${newUrl.short}` })
@@ -101,6 +117,6 @@ export default function handler(
       return res.status(status.NOT_FOUND).json({ message: 'Not Found' })
     }
 
-    res.status(status.OK).json({ url: (data.find(item => item.short === url) as urlModel).url })
+    res.status(status.OK).json({ url: (data.find(item => item.short === url) as IUrlModel).url })
   }
 }
