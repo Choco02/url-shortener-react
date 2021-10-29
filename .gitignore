@@ -37,3 +37,5 @@ yarn.lock
 
 desktop.ini
 .vscode
+
+.env
